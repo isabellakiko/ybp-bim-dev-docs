@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========================================
+   Google-inspired 暗色主题
+   参考: Material Design 3, Google Chrome, Google One
+   ======================================== */
+
+:root {
+  /* 不是纯黑，而是带蓝调的深灰 */
+  --surface-dim: #111827;
+  --surface: #1f2937;
+  --surface-bright: #374151;
+  --on-surface: #f9fafb;
+  --on-surface-variant: #d1d5db;
+  --primary: #60a5fa;
+  --outline: #4b5563;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--surface-dim) 0%, var(--surface) 100%);
+  color: var(--on-surface);
+  font-family: 'Times New Roman', Georgia, 'PingFang SC', 'Microsoft YaHei', serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 链接 */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #93c5fd;
+}
+
+/* 滚动条 - 极简 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--outline);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* 选中文字 */
+::selection {
+  background-color: rgba(96, 165, 250, 0.3);
+}
+
+/* ========================================
+   动画工具类
+   ======================================== */
+
+/* 滚动时显示动画 */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 延迟动画 */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* 悬浮效果 */
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* 渐变背景 */
+.gradient-mesh {
+  background:
+    radial-gradient(at 27% 37%, #3b82f6 0px, transparent 50%),
+    radial-gradient(at 97% 21%, #8b5cf6 0px, transparent 50%),
+    radial-gradient(at 52% 99%, #10b981 0px, transparent 50%),
+    radial-gradient(at 10% 29%, #6366f1 0px, transparent 50%);
+  filter: blur(100px) saturate(150%);
+  opacity: 0.15;
+}
+
+/* 玻璃效果 */
+.glass {
+  background: rgba(31, 41, 55, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ========================================
+   按钮样式
+   ======================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #0c4a6e;
+}
+
+.btn-primary:hover {
+  background: #93c5fd;
+  transform: scale(1.02);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--outline);
+}
+
+.btn-secondary:hover {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: var(--primary);
+}

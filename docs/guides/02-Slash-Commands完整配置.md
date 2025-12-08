@@ -1,10 +1,10 @@
 # Slash Commands 完整配置
 
-> 6 个核心命令的完整 .md 文件内容 - 可直接复制到 `.claude/commands/` 目录使用
+> 8 个核心命令的完整 .md 文件内容 - 可直接复制到 `.claude/commands/` 目录使用
 
-**文档性质**: 配置参考（直接复制使用）
-**版本**: v2.0
-**命令数量**: 6 个
+**文档性质**: 通用配置参考（可跨项目复用）
+**版本**: v2.3
+**命令数量**: 8 个
 
 ---
 
@@ -17,7 +17,9 @@
 5. [/weekly - 每周优化](#5-weekly---每周优化)
 6. [/monthly - 每月归档](#6-monthly---每月归档)
 7. [/audit - 项目健康检查](#7-audit---项目健康检查)
-8. [安装说明](#8-安装说明)
+8. [/deep-audit - 全面深度审计](#8-deep-audit---全面深度审计)
+9. [/fix - ESLint 自动修复](#9-fix---eslint-自动修复)
+10. [安装说明](#10-安装说明)
 
 ---
 
@@ -30,7 +32,9 @@
 | `/end` | end.md | 每日结束 | `--push`, `--no-push` |
 | `/weekly` | weekly.md | 每周文档优化 | `--push` |
 | `/monthly` | monthly.md | 每月归档 | `--push` |
-| `/audit` | audit.md | 项目健康检查 | `--quick`, `--full`, `--security` |
+| `/audit` | audit.md | 项目健康检查 | `--quick`, `--full`, `--security`, `--docs` |
+| `/deep-audit` | deep-audit.md | 全面深度审计 | `--no-fix`, `--no-push` |
+| `/fix` | fix.md | ESLint 自动修复 | `--check`, `--staged` |
 
 ---
 
@@ -905,288 +909,635 @@ EOF
 ## 7. /audit - 项目健康检查
 
 > 文件路径: `.claude/commands/audit.md`
+> **版本**: v2.0（增强版）- 新增深度文档同步审计
+
+### 7.1 功能概述
+
+`/audit` 是项目全面健康检查命令，支持 5 种审计模式：
+
+| 参数 | 审计范围 | 耗时预估 | 适用场景 |
+|------|----------|----------|----------|
+| `--quick` | Git 状态 + 文档日期检查 | 1-2 分钟 | 每天/提交前 |
+| 无参数 | 标准检查（代码 + 依赖 + 文档） | 5-8 分钟 | 每周常规 |
+| `--full` | 完整检查（含构建测试） | 10-15 分钟 | 大版本后 |
+| `--security` | 安全漏洞 + 敏感信息扫描 | 3-5 分钟 | 上线前 |
+| `--docs` | 深度文档同步审计 | 5-10 分钟 | Phase 完成后 |
+
+### 7.2 核心检查项
+
+#### 代码质量检查
+- TODO/FIXME 统计
+- console.log 残留检查
+- 前端构建检查
+- 后端编译检查
+
+#### 依赖健康检查
+- 过时依赖统计（pnpm outdated）
+- 安全漏洞扫描（pnpm audit）
+- 版本一致性（package.json vs tech-stack.md）
+
+#### 文档同步审计（v2.0 新增）
+
+**过时内容检测**：
+- CONTEXT.md 项目阶段与 ROADMAP.md 一致性
+- vision.md "非目标"是否包含已实现功能
+- OVERVIEW.md 架构描述是否过时
+
+**重复内容检测**：
+| 内容类型 | 检查位置 |
+|----------|----------|
+| 技术栈列表 | CONTEXT.md, tech-stack.md, OVERVIEW.md |
+| 目录结构 | CONTEXT.md, DEVELOPMENT.md, OVERVIEW.md |
+| API 端点 | CONTEXT.md, api.md |
+| 功能列表 | CONTEXT.md, vision.md, ROADMAP.md |
+
+**缺失内容检测**：
+- 实际组件 vs 文档组件（components.md）
+- 实际 Controller vs 文档 API（api.md）
+- 实际 Store vs 文档列表（CONTEXT.md）
+
+**日期检查**：
+- 文档最后更新日期是否过旧（>7天警告）
+
+**链接有效性**：
+- 内部链接是否存在目标文件
+
+### 7.3 审计报告格式
+
+```markdown
+# 📋 项目审计报告
+
+**审计时间**: YYYY-MM-DD HH:MM
+**审计模式**: [quick/标准/full/security/docs]
+
+---
+
+## 📊 总览
+
+| 维度 | 状态 | 评分 |
+|------|------|------|
+| 代码质量 | ✅/⚠️/❌ | X/100 |
+| 依赖健康 | ✅/⚠️/❌ | X/100 |
+| 文档同步 | ✅/⚠️/❌ | X/100 |
+| **综合评分** | - | **X/100** |
+
+---
+
+## 🔴 过时内容（需立即修复）
+| 文件 | 问题 | 当前值 | 应改为 |
+|------|------|--------|--------|
+| ... | ... | ... | ... |
+
+## 🟡 重复内容（建议优化）
+| 内容 | 出现位置 | 建议 |
+|------|----------|------|
+| ... | ... | ... |
+
+## 🟢 缺失内容（可选补充）
+| 模块/功能 | 文档位置 | 优先级 |
+|-----------|----------|--------|
+| ... | ... | ... |
+
+## 📅 日期过旧的文档
+## 🔧 代码质量问题
+## 📦 依赖问题
+## 🎯 行动建议（优先级排序）
+```
+
+### 7.4 使用建议
+
+```bash
+# 快速检查（每天/提交前）
+/audit --quick
+
+# 标准检查（每周）
+/audit
+
+# 完整审计（大版本后）
+/audit --full
+
+# 深度文档审计（Phase 完成后）
+/audit --docs
+
+# 安全检查（上线前）
+/audit --security
+```
+
+### 7.5 工作流程概述
+
+由于 `/audit` 命令内容较长（400+ 行），请直接参考项目中的 `.claude/commands/audit.md` 文件。
+
+**主要工作流程**：
+1. **Step 0**: 获取基本信息（时间、项目、最近提交）
+2. **Step 1**: 解析参数（确定审计范围）
+3. **Step 2**: 项目结构探索（代码/文档统计）
+4. **Step 3**: 代码质量检查（TODO/FIXME、console.log、编译）
+5. **Step 4**: 依赖健康检查（过时、漏洞、版本一致性）
+6. **Step 5**: 文档同步审计（核心 - 过时/重复/缺失检测）
+7. **Step 6**: Slash Commands 检查
+8. **Step 7**: 生成审计报告
+9. **Step 8**: 执行优化（需用户确认后执行）
+10. **Step 9**: 提交变更
+
+### 7.6 检查清单
+
+#### Quick 模式
+- [ ] Git 是否有未提交的更改？
+- [ ] CONTEXT.md 项目阶段是否正确？
+- [ ] CURRENT.md 是否更新？
+- [ ] 各文档日期是否过旧（>7天）？
+
+#### 标准模式额外检查
+- [ ] 前端依赖是否有过时版本？
+- [ ] 后端是否能正常编译？
+- [ ] 组件数量与文档是否一致？
+- [ ] API 数量与文档是否一致？
+
+#### Full 模式额外检查
+- [ ] 前端构建是否成功？
+- [ ] 后端构建是否成功？
+- [ ] 所有测试是否通过？
+
+#### Docs 模式深度检查
+- [ ] 每个文档的每个章节是否准确？
+- [ ] 所有代码示例是否可运行？
+- [ ] 所有链接是否有效？
+- [ ] 是否有遗漏的新功能？
+
+#### Security 模式检查
+- [ ] 是否有硬编码的密钥/密码？
+- [ ] .env 是否在 .gitignore 中？
+- [ ] 依赖是否有已知漏洞？
+- [ ] API 是否有认证保护？
+
+### 7.7 最佳实践
+
+1. **每次完成 Phase 后**: `/audit --full`
+2. **每周一次**: `/audit`
+3. **每天提交前**: `/audit --quick`
+4. **上线前**: `/audit --security`
+
+**常见问题处理**：
+
+**Q: 发现大量过时内容怎么办？**
+A: 优先处理 CONTEXT.md 和 ROADMAP.md，这两个是 AI 上下文恢复的核心。
+
+**Q: 重复内容如何决定保留哪个？**
+A: 按专门性原则：技术栈保留 tech-stack.md，API 保留 api.md，通用信息保留 CONTEXT.md。
+
+**Q: 审计太慢怎么办？**
+A: 使用 `--quick` 模式，只检查最关键的同步问题。
+
+---
+
+## 8. /deep-audit - 全面深度审计
+
+> 文件路径: `.claude/commands/deep-audit.md`
+
+### 8.1 完整配置
 
 ```markdown
 ---
-description: 项目健康检查，代码质量、依赖、文档同步
-argument-hint: [--quick | --full | --security]
-allowed-tools: Read, Bash(date, git, npm/yarn/pnpm, find, grep, wc)
+description: 全面深度审计，不放过任何文件和代码行，自动优化并提交
+argument-hint: [--no-fix|--no-push]
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, TodoWrite
 ---
 
 <task>
-执行项目健康检查，生成审计报告，识别问题并提供建议。
+执行全面深度审计：探索每个文件、每行代码，对比文档与代码实际状态，**自动修复所有问题并提交**。
+
+**审计范围（不放过任何角落）**：
+1. 代码结构 - 组件/页面/Hooks/样式/配置
+2. 文档系统 - AI 上下文/开发文档/架构文档/项目文档
+3. Slash Commands - 所有 .claude/commands/*.md 命令
+4. 设计系统 - CSS 变量/字体/颜色/动画
+5. 依赖健康 - package.json vs 文档记录
+6. 冗余检测 - 重复文件/过时内容/空目录
+
+**默认行为**：审计 → 修复 → 提交 → 推送
+**参数说明**：
+- `--no-fix`: 仅审计，不修复
+- `--no-push`: 修复并提交，但不推送
 </task>
 
 <workflow>
 
-## Step 0: 获取当前时间和项目信息（必须）
+## Step 0: 初始化审计任务
 
-```bash
-CURRENT_DATE=$(date +%Y-%m-%d)
-CURRENT_TIME=$(date +%H:%M)
-CURRENT_WEEK_NUM=$(date +%V)
-
-echo "审计时间: $CURRENT_DATE $CURRENT_TIME (第 $CURRENT_WEEK_NUM 周)"
+**创建任务清单**（使用 TodoWrite）：
+```
+1. [pending] 代码结构全面探索
+2. [pending] 文档系统全面探索
+3. [pending] Slash Commands 审计
+4. [pending] 设计系统审计
+5. [pending] 依赖健康审计
+6. [pending] 对比分析并识别问题
+7. [pending] 生成审计报告
+8. [pending] 执行全部优化
+9. [pending] 提交并推送变更
 ```
 
-### 检测包管理器
-
+**获取当前时间**：
 ```bash
-# 检测使用的包管理器
-if [ -f "pnpm-lock.yaml" ]; then
-    PM="pnpm"
-elif [ -f "yarn.lock" ]; then
-    PM="yarn"
-elif [ -f "bun.lockb" ]; then
-    PM="bun"
-else
-    PM="npm"
-fi
-echo "包管理器: $PM"
+AUDIT_DATE=$(date +%Y-%m-%d)
+AUDIT_TIME=$(date +%H:%M)
 ```
-
-## Step 1: 解析参数
-
-| 参数 | 检查范围 | 预计时间 |
-|------|----------|----------|
-| `--quick` | 代码质量 + Git 状态 | 2-3 分钟 |
-| 无参数 | 标准检查（不含性能测试） | 5-10 分钟 |
-| `--full` | 全部检查（含构建性能测试） | 10-15 分钟 |
-| `--security` | 重点安全漏洞扫描 | 3-5 分钟 |
-
-## Step 2: 代码质量检查
-
-### 2.1 ESLint 检查（前端）
-
-```bash
-# 进入前端目录
-cd apps/frontend
-
-# 运行 ESLint
-$PM run lint 2>&1 || true
-
-# 统计 errors 和 warnings
-echo "ESLint 检查完成"
-```
-
-### 2.2 未使用依赖检查
-
-```bash
-# 使用 depcheck（需要先安装）
-cd apps/frontend
-$PM exec depcheck 2>&1 || echo "depcheck 未安装或检查失败"
-```
-
-### 2.3 代码 TODO/FIXME 统计
-
-```bash
-# 统计代码中的 TODO 和 FIXME
-echo "=== TODO/FIXME 统计 ==="
-grep -r "TODO\|FIXME" apps/ --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" --include="*.java" --include="*.py" 2>/dev/null | wc -l
-```
-
-## Step 3: 依赖健康检查
-
-### 3.1 过时依赖统计
-
-```bash
-cd apps/frontend
-$PM outdated 2>&1 || true
-```
-
-### 3.2 安全漏洞扫描
-
-```bash
-cd apps/frontend
-$PM audit 2>&1 || true
-```
-
-### 3.3 tech-stack.md 版本一致性
-
-读取 `docs/architecture/tech-stack.md` 和 `package.json`（或 pom.xml），对比版本。
-
-## Step 4: 性能指标追踪（--full 模式）
-
-### 4.1 构建性能测试
-
-```bash
-cd apps/frontend
-echo "开始构建性能测试..."
-time $PM run build 2>&1
-```
-
-### 4.2 产物大小统计
-
-```bash
-# 统计构建产物大小
-du -sh apps/frontend/dist 2>/dev/null || du -sh apps/frontend/.next 2>/dev/null || echo "未找到构建产物"
-```
-
-## Step 5: 文档同步检查
-
-### 5.1 组件文档完整性
-
-```bash
-# 统计实际组件数
-ACTUAL_COMPONENTS=$(find apps/frontend/src/components -name "*.jsx" -o -name "*.tsx" 2>/dev/null | wc -l)
-
-# 统计文档中的组件数（从 components.md 读取）
-echo "实际组件数: $ACTUAL_COMPONENTS"
-```
-
-对比 `docs/development/frontend/components.md` 中记录的组件数。
-
-### 5.2 API 文档完整性
-
-检查 `docs/development/backend/api.md` 是否覆盖所有 API 端点。
-
-### 5.3 CONTEXT.md 准确性
-
-检查 CONTEXT.md 中的：
-- 项目阶段是否与实际一致
-- 技术栈版本是否准确
-- 下一步任务是否与 CURRENT.md 一致
-
-## Step 6: Git 状态检查
-
-```bash
-echo "=== Git 状态 ==="
-# 未提交文件统计
-git status --short | wc -l
-
-# 本周 commits 统计
-WEEK_START=$(date -v-$(( $(date +%u) - 1 ))d +%Y-%m-%d 2>/dev/null || date -d "last monday" +%Y-%m-%d)
-git log --since="$WEEK_START" --oneline | wc -l
-```
-
-## Step 7: 生成审计报告
-
-创建报告文件：`docs/reports/audit-${CURRENT_DATE}.md`
-
-```markdown
-# 项目健康度审计报告
-
-**审计时间**: ${CURRENT_DATE} ${CURRENT_TIME}（第 ${CURRENT_WEEK_NUM} 周）
-**审计模式**: [--quick | 标准 | --full | --security]
 
 ---
 
-## 1️⃣ 代码质量 [✅优秀 | ⚠️良好 | ❌需改进]
+## Step 1: 代码结构全面探索（标记 in_progress）
 
-| 指标 | 结果 | 状态 |
-|------|------|------|
-| ESLint errors | X 个 | ✅/❌ |
-| ESLint warnings | X 个 | ✅/⚠️ |
-| 未使用依赖 | X 个 | ✅/⚠️ |
-| TODO/FIXME | X 个 | ✅/⚠️ |
+### 1.1 组件目录完整扫描
 
-**评分**: XX/100
-
----
-
-## 2️⃣ 依赖健康 [✅优秀 | ⚠️良好 | ❌需改进]
-
-| 指标 | 结果 | 状态 |
-|------|------|------|
-| 总依赖数 | X 个 | - |
-| 可更新 (Major) | X 个 | ⚠️ |
-| 可更新 (Minor) | X 个 | 📝 |
-| 可更新 (Patch) | X 个 | 📝 |
-| 安全漏洞 (Critical) | X 个 | ✅/❌ |
-| 安全漏洞 (High) | X 个 | ✅/❌ |
-
-**建议更新**:
-- [依赖名]: X.X.X → Y.Y.Y (原因)
-
----
-
-## 3️⃣ 性能指标 [✅优秀 | ⚠️良好 | ❌需改进]
-
-| 指标 | 结果 | 基准 | 状态 |
-|------|------|------|------|
-| 构建时间 | Xs | <5s | ✅/⚠️ |
-| 产物大小 | XMB | <3MB | ✅/⚠️ |
-
----
-
-## 4️⃣ 文档同步 [✅完整 | ⚠️需更新 | ❌缺失严重]
-
-| 文档 | 状态 | 说明 |
-|------|------|------|
-| components.md | ✅/⚠️ | X/Y 已文档化 |
-| api.md | ✅/⚠️ | X/Y 已文档化 |
-| tech-stack.md | ✅/⚠️ | X 个版本不一致 |
-| CONTEXT.md | ✅/⚠️ | [准确/需更新] |
-
-**遗漏文档**:
-- [组件/API 名称]
-
----
-
-## 5️⃣ Git 状态
-
-| 指标 | 结果 |
-|------|------|
-| 未提交文件 | X 个 |
-| 本周 commits | X 次 |
-
----
-
-## 📊 综合健康度评分
-
-**总评**: XX/100 [✅优秀 | ⚠️良好 | ❌需改进]
-
----
-
-## 🎯 行动建议（优先级排序）
-
-### 立即处理 (Critical)
-1. [建议 1]
-
-### 本周完成 (High)
-1. [建议 2]
-2. [建议 3]
-
-### 下周计划 (Medium)
-1. [建议 4]
-
----
-
-**报告路径**: docs/reports/audit-${CURRENT_DATE}.md
+**扫描所有组件子目录**：
+```bash
+echo "=== UI 组件 ===" && ls -la ${FE_PATH}/src/components/ui/
+echo "=== 装饰组件 ===" && ls -la ${FE_PATH}/src/components/decorations/
+echo "=== 布局组件 ===" && ls -la ${FE_PATH}/src/components/layout/
+echo "=== 区块组件 ===" && ls -la ${FE_PATH}/src/components/sections/
 ```
 
-## Step 8: 输出摘要
-
+**记录格式**：
 ```
-## 📋 审计完成
+实际组件列表:
+├── UI (X 个): [组件名称列表]
+├── 装饰 (X 个): [组件名称列表]
+├── 布局 (X 个): [组件名称列表]
+└── 区块 (X 个): [组件名称列表]
+```
 
-**时间**: ${CURRENT_DATE} ${CURRENT_TIME}
-**模式**: [--quick | 标准 | --full | --security]
+### 1.2 Feature/页面深度扫描
 
-### 快速摘要
-- **代码质量**: [✅/⚠️/❌] XX/100
-- **依赖健康**: [✅/⚠️/❌]
-- **文档同步**: [✅/⚠️/❌]
-- **综合评分**: XX/100
+**对每个 Feature 进行递归扫描**：
+```bash
+for dir in ${FE_PATH}/src/features/*/; do
+  echo "=== $(basename $dir) ==="
+  find "$dir" -type f -name "*.jsx" -o -name "*.js" -o -name "*.css" | head -30
+done
+```
 
-### 需要关注
-- [Critical 级别的问题]
+### 1.3 Hooks 完整扫描
 
-### 报告位置
-docs/reports/audit-${CURRENT_DATE}.md
+```bash
+ls -la ${FE_PATH}/src/hooks/
+find ${FE_PATH}/src/features -name "use*.js" -o -name "use*.jsx"
+```
+
+### 1.4 样式系统扫描
+
+```bash
+ls -laR ${FE_PATH}/src/styles/
+```
+
+### 1.5 配置文件扫描
+
+```bash
+cat ${FE_PATH}/package.json
+cat ${FE_PATH}/vite.config.js
+```
 
 ---
-详细报告已生成，是否需要我解释某个部分？
+
+## Step 2: 文档系统全面探索（标记 in_progress）
+
+### 2.1 扫描所有文档文件
+
+```bash
+find . -name "*.md" -not -path "*/node_modules/*" -type f | sort
+find . -name "*.md" -not -path "*/node_modules/*" -type f | wc -l
+```
+
+### 2.2 必须完整读取的核心文档
+
+1. `docs/ai-context/CONTEXT.md` - 项目上下文（逐行检查）
+2. `docs/ai-context/CURRENT.md` - 当前进度（逐行检查）
+3. `docs/development/frontend/components.md` - 组件文档
+4. `docs/development/frontend/pages.md` - 页面文档
+5. `docs/architecture/tech-stack.md` - 技术栈详解
+6. `docs/project/ROADMAP.md` - 路线图
+
+---
+
+## Step 3: Slash Commands 审计（标记 in_progress）
+
+### 3.1 扫描所有命令文件
+
+```bash
+ls -la .claude/commands/
+```
+
+### 3.2 逐一检查每个命令
+
+**检查项**：
+```
+命令: /[name]
+├── 描述: [读取 description]
+├── 参数: [读取 argument-hint]
+├── 允许工具: [读取 allowed-tools]
+├── 工作流完整性: [检查是否有遗漏步骤]
+├── 文档引用准确性: [检查引用的文件路径是否存在]
+└── 问题: [列出发现的问题]
+```
+
+---
+
+## Step 4: 设计系统审计（标记 in_progress）
+
+### 4.1 对比 CSS 变量与文档
+
+```bash
+grep -h "^  --" ${FE_PATH}/src/styles/variables/*.css | sort
+```
+
+### 4.2 检查字体系统
+
+```bash
+grep -A 5 "fonts.googleapis.com" ${FE_PATH}/index.html
+grep "font-family" ${FE_PATH}/src/styles/variables/typography.css
+```
+
+---
+
+## Step 5: 依赖健康审计（标记 in_progress）
+
+```bash
+cat ${FE_PATH}/package.json | grep -A 200 '"dependencies"' | head -100
+cd ${FE_PATH} && ${PM} outdated 2>/dev/null || echo "跳过 outdated 检查"
+```
+
+---
+
+## Step 6: 对比分析并识别问题（标记 in_progress）
+
+**对比维度**：
+- 代码中的组件 vs components.md 记录
+- 代码中的页面结构 vs pages.md 记录
+- package.json vs tech-stack.md
+- 实际完成情况 vs CONTEXT.md/ROADMAP.md 记录
+- 命令引用的文件 vs 实际存在的文件
+- 实际 CSS 变量 vs 设计系统文档
+
+**问题分类**：
+```
+P0 - 严重（立即修复）:
+1. [问题描述]
+
+P1 - 中等（今日修复）:
+1. [问题描述]
+
+P2 - 轻微（本周修复）:
+1. [问题描述]
+```
+
+---
+
+## Step 7: 生成审计报告（标记 in_progress）
+
+**写入** `docs/reports/deep-audit-YYYY-MM-DD.md`
+
+---
+
+## Step 8: 执行全部优化（标记 in_progress）
+
+**注意**：除非包含 `--no-fix` 参数，否则自动执行修复
+
+- 更新 CONTEXT.md/CURRENT.md/ROADMAP.md
+- 更新 components.md/pages.md/tech-stack.md
+- 优化 Slash Commands
+- 清理冗余文件
+
+---
+
+## Step 9: 提交并推送变更（标记 in_progress）
+
+**注意**：除非包含 `--no-push` 参数，否则自动推送
+
+```bash
+git add .
+git commit -m "docs: 全面深度审计与自动优化
+
+审计范围:
+- 代码结构: X 个文件
+- 文档系统: X 个文件
+- Slash Commands: X 个命令
+- 设计系统: X 个变量
+
+发现并修复:
+- P0 严重问题: X 处
+- P1 中等问题: X 处
+- P2 轻微问题: X 处
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+git push
+```
+
+---
+
+## Step 10: 完成审计
+
+**输出完成报告**：
+```
+═══════════════════════════════════════════════════════════
+✅ 全面深度审计完成！
+═══════════════════════════════════════════════════════════
+
+📊 审计统计:
+├── 扫描代码文件: X 个
+├── 扫描文档文件: X 个
+├── 审计 Slash Commands: X 个
+├── 检查设计系统变量: X 个
+└── 总计扫描: X 项
+
+🔧 修复统计:
+├── P0 严重问题: X 处 ✅ 已修复
+├── P1 中等问题: X 处 ✅ 已修复
+├── P2 轻微问题: X 处 ✅ 已修复
+└── 总计修复: X 处
+
+📝 生成报告: docs/reports/deep-audit-YYYY-MM-DD.md
+
+⏰ 下次建议审计: 一周后或重大变更后
+═══════════════════════════════════════════════════════════
 ```
 
 </workflow>
 ```
 
+> **注意**：上述为精简版本，完整版本约 800 行，包含更详细的扫描规则和记录格式。请根据项目需求调整路径变量（`${FE_PATH}`, `${PM}`）。
+
+### 8.2 与 /audit 的区别
+
+| 特性 | /audit | /deep-audit |
+|------|--------|-------------|
+| 审计深度 | 标准检查 | 不放过任何文件 |
+| Slash Commands | 不检查 | 全面检查 frontmatter、描述、工具权限 |
+| 设计系统 | 不检查 | CSS 变量审计、命名规范 |
+| 依赖审计 | 基础检查 | package.json vs 实际使用深度对比 |
+| 默认行为 | 仅报告 | 自动修复 + 推送 |
+| 使用频率 | 每周 | 每个 Phase 完成后 |
+
+### 8.3 使用建议
+
+```bash
+# 完整审计 + 自动修复 + 推送（推荐）
+/deep-audit
+
+# 仅审计，不修复（用于检查）
+/deep-audit --no-fix
+
+# 审计修复，不推送（本地验证）
+/deep-audit --no-push
+```
+
+### 8.4 变量说明
+
+在使用此命令时，需要根据项目调整以下变量：
+
+| 变量 | 说明 | 示例 |
+|------|------|------|
+| `${FE_PATH}` | 前端应用路径 | `apps/frontend` |
+| `${PM}` | 包管理器 | `pnpm`, `npm`, `yarn` |
+| `${PM_RUN}` | 运行脚本命令 | `pnpm run`, `npm run` |
+
 ---
 
-## 8. 安装说明
+## 9. /fix - ESLint 自动修复
 
-### 8.1 快速安装
+> 文件路径: `.claude/commands/fix.md`
+
+### 9.1 完整配置
+
+```markdown
+---
+description: ESLint 自动修复，一键修复可自动修复的代码问题
+argument-hint: [--check|--staged]
+allowed-tools: Bash(cd ${FE_PATH} && ${PM_RUN} lint:*), Bash(npx lint-staged:*)
+---
+
+<task>
+执行 ESLint 自动修复，修复所有可自动修复的代码问题。
+</task>
+
+<workflow>
+
+## Step 1: 解析参数
+
+**参数说明**：
+- 无参数：修复全部文件
+- `--check`：仅检查，不修复
+- `--staged`：仅修复已 staged 的文件
+
+---
+
+## Step 2: 执行修复/检查
+
+### 默认模式（无参数）
+
+```bash
+cd ${FE_PATH} && ${PM_RUN} lint --fix
+```
+
+### 检查模式（--check）
+
+```bash
+cd ${FE_PATH} && ${PM_RUN} lint
+```
+
+### Staged 模式（--staged）
+
+```bash
+cd ${FE_PATH} && npx lint-staged
+```
+
+---
+
+## Step 3: 输出报告
+
+**报告格式**：
+
+```
+📊 ESLint 修复报告
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 模式: [修复/检查/Staged]
+
+📈 结果:
+  - Errors: X 个
+  - Warnings: X 个
+
+✅ 状态: [通过/有警告/有错误]
+
+💡 剩余需手动修复的问题:
+  [列出无法自动修复的问题，如有]
+```
+
+</workflow>
+
+<examples>
+## 使用示例
+
+```bash
+# 修复全部
+/fix
+
+# 仅检查，不修复
+/fix --check
+
+# 仅修复 staged 文件（commit 前使用）
+/fix --staged
+```
+</examples>
+```
+
+### 9.2 参数说明
+
+| 参数 | 说明 | 适用场景 |
+|------|------|----------|
+| 无参数 | 修复全部文件 | 日常开发 |
+| `--check` | 仅检查，不修复 | CI/CD 或审查 |
+| `--staged` | 仅修复已 staged 的文件 | commit 前使用 |
+
+### 9.3 变量说明
+
+根据项目调整以下变量：
+
+| 变量 | 说明 | 示例 |
+|------|------|------|
+| `${FE_PATH}` | 前端应用路径 | `apps/frontend` |
+| `${PM_RUN}` | 运行脚本命令 | `pnpm run`, `npm run`, `yarn` |
+
+### 9.4 使用建议
+
+```bash
+# 日常开发：修复全部
+/fix
+
+# 提交前：只修复暂存文件
+/fix --staged
+
+# 检查代码质量（CI 使用）
+/fix --check
+```
+
+### 9.5 与 /deep-audit 的关系
+
+| 命令 | 用途 | ESLint 处理 |
+|------|------|-------------|
+| `/fix` | 快速修复代码规范 | 仅 ESLint |
+| `/deep-audit` | 全面审计 | 包含 ESLint + 更多 |
+
+**建议**：
+- 日常开发使用 `/fix` 快速修复
+- Phase 完成后使用 `/deep-audit` 全面审计
+
+---
+
+## 10. 安装说明
+
+### 10.1 快速安装
 
 ```bash
 # 1. 创建目录
@@ -1200,9 +1551,11 @@ mkdir -p .claude/commands
 # - .claude/commands/weekly.md
 # - .claude/commands/monthly.md
 # - .claude/commands/audit.md
+# - .claude/commands/deep-audit.md
+# - .claude/commands/fix.md
 ```
 
-### 8.2 验证安装
+### 10.2 验证安装
 
 在 Claude Code 中测试：
 
@@ -1212,7 +1565,7 @@ mkdir -p .claude/commands
 
 应该看到 AI 读取文档并输出验证报告。
 
-### 8.3 注意事项
+### 10.3 注意事项
 
 1. **时间命令兼容性**
    - macOS 使用 `date -v` 语法
@@ -1230,5 +1583,6 @@ mkdir -p .claude/commands
 
 ---
 
-**版本**: v2.0
-**更新日期**: 2025-11-26
+**文档性质**: 通用配置参考（可跨项目复用）
+**版本**: v2.3
+**更新日期**: 2025-12-07

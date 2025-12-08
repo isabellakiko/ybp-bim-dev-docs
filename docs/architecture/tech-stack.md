@@ -20,12 +20,6 @@
 | PostCSS | ^8.5.6 | CSS 处理器 | [postcss.org](https://postcss.org/) |
 | Autoprefixer | ^10.4.22 | CSS 自动添加浏览器前缀 | [github.com/postcss/autoprefixer](https://github.com/postcss/autoprefixer) |
 
-### 可视化
-
-| 技术 | 版本 | 用途 | 官网 |
-|------|------|------|------|
-| @xyflow/react | ^12.9.3 | 流程图和节点编辑器 | [reactflow.dev](https://reactflow.dev/) |
-
 ### Markdown 支持
 
 | 技术 | 版本 | 用途 | 官网 |
@@ -108,8 +102,7 @@ YBP Frontend
 │
 ├─── React 19
 │    ├─── React DOM
-│    ├─── React Router DOM 7
-│    └─── @xyflow/react
+│    └─── React Router DOM 7
 │
 ├─── Vite 7
 │    ├─── @vitejs/plugin-react
@@ -143,7 +136,6 @@ YBP Frontend
 |------|------|------|
 | React + React DOM | ~140 KB | 核心框架（gzip 后） |
 | React Router | ~15 KB | 路由库 |
-| @xyflow/react | ~80 KB | 流程图库 |
 | Tailwind CSS | 按需生成 | 仅包含使用的样式 |
 | Markdown 相关 | ~50 KB | 所有 Markdown 处理库 |
 

@@ -2,8 +2,8 @@
 
 > YBP 项目 AI 协作命令参考文档
 
-**最后更新**: 2025-12-02
-**命令数量**: 6 个
+**最后更新**: 2025-12-08
+**命令数量**: 8 个
 
 ---
 
@@ -26,6 +26,8 @@ Slash Commands 是与 Claude Code 协作的核心工具，帮助实现：
 | `/weekly` | 每周文档优化 | 每周日 | `--push` |
 | `/monthly` | 每月归档 | 每月初 | `--push` |
 | `/audit` | 项目健康检查 | 定期 | `--quick`, `--full`, `--security` |
+| `/deep-audit` | 全面深度审计 | Phase 完成后 | `--no-fix`, `--no-push` |
+| `/fix` | ESLint 自动修复 | 按需 | `--check`, `--staged` |
 
 ---
 
@@ -178,6 +180,57 @@ Slash Commands 是与 Claude Code 协作的核心工具，帮助实现：
 
 ---
 
+### `/deep-audit` - 全面深度审计
+
+**用途**: Phase 完成后执行，不放过任何文件和代码行
+
+**参数**:
+- 无参数: 审计 → 修复 → 提交 → 推送
+- `--no-fix`: 仅审计，不修复
+- `--no-push`: 修复并提交，但不推送
+
+**检查内容**:
+1. 代码结构 - 组件/页面/样式/配置
+2. 文档系统 - 全部文档逐行检查
+3. Slash Commands - 命令完整性审计
+4. 设计系统 - CSS 变量/字体/颜色
+5. 依赖健康 - package.json vs 文档
+6. 冗余检测 - 重复文件/过时内容
+
+**输出**: 详细审计报告 + 自动修复
+
+**示例**:
+```bash
+/deep-audit           # 完整审计 + 自动修复
+/deep-audit --no-fix  # 仅审计，不修复
+/deep-audit --no-push # 修复但不推送
+```
+
+---
+
+### `/fix` - ESLint 自动修复
+
+**用途**: 快速修复可自动修复的代码问题
+
+**参数**:
+- 无参数: 修复全部文件
+- `--check`: 仅检查，不修复
+- `--staged`: 仅修复已 staged 的文件
+
+**执行内容**:
+1. 运行 ESLint
+2. 自动修复可修复的问题
+3. 输出修复报告
+
+**示例**:
+```bash
+/fix           # 修复全部
+/fix --check   # 仅检查
+/fix --staged  # 修复 staged 文件
+```
+
+---
+
 ## 每日工作流
 
 ```
@@ -202,9 +255,11 @@ Slash Commands 是与 Claude Code 协作的核心工具，帮助实现：
 ## 每周/每月维护
 
 ```
-每周日: /weekly --push   ← 文档优化
-每月初: /monthly --push  ← 归档
-定期:   /audit --full    ← 健康检查
+每周日: /weekly --push       ← 文档优化
+每月初: /monthly --push      ← 归档
+定期:   /audit --full        ← 健康检查
+Phase后: /deep-audit         ← 全面深度审计
+按需:   /fix                 ← ESLint 修复
 ```
 
 ---
@@ -218,7 +273,9 @@ Slash Commands 是与 Claude Code 协作的核心工具，帮助实现：
 ├── end.md
 ├── weekly.md
 ├── monthly.md
-└── audit.md
+├── audit.md
+├── deep-audit.md
+└── fix.md
 ```
 
 ---

@@ -125,5 +125,55 @@
         "description": "系统健康检查、问题排查、优化建议"
       }
     ]
+  },
+  "development": {
+    "description": "开发文档 - 前端开发指南与规范",
+    "files": [
+      {
+        "filename": "DEVELOPMENT.md",
+        "title": "开发指南",
+        "description": "快速启动、项目结构、技术栈、开发命令"
+      },
+      {
+        "filename": "SLASH_COMMANDS.md",
+        "title": "Slash Commands 参考",
+        "description": "8 个 Slash Commands 使用说明"
+      },
+      {
+        "filename": "frontend/components.md",
+        "title": "组件文档",
+        "description": "可复用组件的 API 和使用方法"
+      },
+      {
+        "filename": "frontend/pages.md",
+        "title": "页面文档",
+        "description": "页面结构、路由配置、核心数据"
+      },
+      {
+        "filename": "frontend/troubleshooting.md",
+        "title": "问题排查",
+        "description": "常见问题解决方案"
+      }
+    ]
+  },
+  "architecture": {
+    "description": "架构文档 - 技术选型与架构决策",
+    "files": [
+      {
+        "filename": "OVERVIEW.md",
+        "title": "架构总览",
+        "description": "系统架构、技术选型理由、目录结构"
+      },
+      {
+        "filename": "tech-stack.md",
+        "title": "技术栈详情",
+        "description": "React 19 + Vite 7 + Tailwind CSS 3"
+      },
+      {
+        "filename": "adr/README.md",
+        "title": "架构决策记录",
+        "description": "ADR 索引与历史决策"
+      }
+    ]
   }
 }

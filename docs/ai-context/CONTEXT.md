@@ -20,11 +20,11 @@
 - 易达（广州易达建信科技开发有限公司）- 开发方
 
 **已完成**:
-- 网页可视化展示（3 页面）
-- Google-inspired 暗色主题
+- 网页可视化展示（3 页面 + 4 占位路由）
+- GitHub Dark 温暖深色调 + 侧边导航
 - 项目重构为 Monorepo 结构
 - 4 层文档架构
-- 6 个 Slash Commands
+- 9 个 Slash Commands
 
 ---
 
@@ -47,13 +47,17 @@ YBP/
 
 ---
 
-## 页面列表（3个）
+## 页面列表（7个路由）
 
 | 路由 | 页面 | 功能 |
 |------|------|------|
-| `/` | HomePage | 项目概览 + 完整工作流程 |
-| `/logic` | LogicPage | 匹配规则 + 典型案例 |
-| `/issues` | IssuesPage | 问题追踪 |
+| `/` | HomePage | 仪表盘风格首页（统计+快速入口+活动） |
+| `/logic` | LogicPage | 匹配规则 + 计算类型 |
+| `/issues` | IssuesPage | 问题追踪（筛选+列表） |
+| `/quantity` | QuantityPage | 工程量梳理总览（占位） |
+| `/quantity/owner` | QuantityPage | 业主清单（占位） |
+| `/quantity/pipe` | QuantityPage | 水管系统（占位） |
+| `/quantity/duct` | QuantityPage | 风管系统（占位） |
 
 ---
 
@@ -71,14 +75,35 @@ YBP/
 
 ## 设计系统
 
-**风格**: Google 暗色主题
-**字体**: Times New Roman + PingFang SC
+**风格**: GitHub Dark 温暖深色调
+**布局**: 侧边导航（260px 展开 / 72px 折叠）+ 主内容区
+**字体**: 系统字体栈（-apple-system, BlinkMacSystemFont, PingFang SC）
+
 **核心配色**:
-- 背景: `#1f2937` (surface)
-- 主色: `#60a5fa` (primary blue)
-- 文字: `#f9fafb` (on-surface)
+```css
+/* 背景色（层次渐进，非纯黑）*/
+--bg-base:      #0d1117;  /* 最深背景 */
+--bg-surface:   #161b22;  /* 主表面 */
+--bg-elevated:  #1c2128;  /* 卡片背景 */
+--bg-hover:     #262c36;  /* 悬浮状态 */
+
+/* 文字色 */
+--text-primary:   #e6edf3;  /* 主文字 */
+--text-secondary: #8b949e;  /* 次要文字 */
+--text-tertiary:  #6e7681;  /* 辅助文字 */
+
+/* 强调色 */
+--accent-blue:   #58a6ff;
+--accent-green:  #3fb950;
+--accent-amber:  #d29922;
+--accent-red:    #f85149;
+--accent-purple: #a371f7;
+```
+
+**组件类**: `.card`, `.badge`, `.btn-ghost`, `.status-dot`
 
 > 详见 CSS 变量定义: `apps/frontend/src/index.css`
+> 详见 设计文档: `docs/project/design/00_网页设计总览.md`
 
 ---
 
@@ -144,8 +169,9 @@ YBP/
 ## 协作偏好
 
 ### 设计约束
-- ✅ Google 风格暗色主题
-- ✅ Times New Roman 字体
+- ✅ GitHub Dark 温暖深色调（非纯黑）
+- ✅ 系统字体栈（非衬线体）
+- ✅ 侧边导航布局
 - ✅ 中文优先
 - ❌ 不使用 TypeScript
 - ❌ 不使用 Tailwind v4

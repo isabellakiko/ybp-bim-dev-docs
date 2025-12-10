@@ -175,5 +175,42 @@
         "description": "ADR 索引与历史决策"
       }
     ]
+  },
+  "design": {
+    "description": "设计文档 - 网页设计规范与页面设计",
+    "path": "project/design/",
+    "files": [
+      {
+        "filename": "00_网页设计总览.md",
+        "title": "网页设计总览",
+        "description": "GitHub Dark 风格设计系统、布局、组件类"
+      },
+      {
+        "filename": "01_首页设计.md",
+        "title": "首页设计",
+        "description": "仪表盘风格首页设计"
+      },
+      {
+        "filename": "02_业务逻辑页设计.md",
+        "title": "业务逻辑页设计",
+        "description": "匹配规则与计算类型"
+      },
+      {
+        "filename": "03_问题追踪页设计.md",
+        "title": "问题追踪页设计",
+        "description": "问题跟踪与筛选"
+      }
+    ]
+  },
+  "reports": {
+    "description": "审计报告 - 项目健康检查与优化记录",
+    "path": "深度排查/",
+    "files": [
+      {
+        "filename": "排查报告-2025-12-10.md",
+        "title": "深度审计报告",
+        "description": "2025-12-10 全面审计与自动优化"
+      }
+    ]
   }
 }

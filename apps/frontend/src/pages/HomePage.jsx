@@ -150,7 +150,7 @@ export default function HomePage() {
       <section className="card p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-semibold">项目阶段</h2>
-          <span className="badge badge-blue">第二阶段 · 开发准备</span>
+          <span className="badge badge-blue">第四阶段 · 开发准备</span>
         </div>
         <div className="flex items-center justify-between max-w-lg mx-auto relative">
           {/* 进度条背景 */}

@@ -1,4 +1,6 @@
-import { useEffect, useRef } from 'react'
+/**
+ * YBP 业务逻辑页 - 清单匹配规则与工程量计算
+ */
 
 // 5种匹配规则
 const matchTypes = [
@@ -7,117 +9,99 @@ const matchTypes = [
     name: '无条件匹配',
     desc: '所有族实例都带出该清单',
     example: '排风扇 → 电源清单',
-    gradient: 'from-emerald-500 to-teal-500',
+    color: 'green',
   },
   {
     id: 'range',
     name: '单参数区间',
     desc: '参数值落在指定范围内',
     example: '2000 ≤ 风量 < 4000',
-    gradient: 'from-amber-500 to-orange-500',
+    color: 'amber',
   },
   {
     id: 'exact',
     name: '单参数精确',
     desc: '参数值完全相等时匹配',
     example: '材质 = 灰色砖',
-    gradient: 'from-blue-500 to-indigo-500',
+    color: 'blue',
   },
   {
     id: 'multi-and',
     name: '多参数 AND',
     desc: '多个条件同时满足',
     example: '材质=灰砖 AND 品牌=琛雄',
-    gradient: 'from-purple-500 to-pink-500',
+    color: 'purple',
   },
   {
     id: 'multi-range',
     name: '多参数区间联合',
     desc: '多参数都做区间判断',
     example: '风量≥4000 AND 功率≥500',
-    gradient: 'from-rose-500 to-red-500',
+    color: 'red',
   },
 ]
 
 // 4种工程量计算
 const quantityTypes = [
-  { name: '计数', desc: '统计族实例数量', unit: '台/个/套' },
-  { name: '参数汇总', desc: '某参数值求和', unit: 'm²/m/m³' },
-  { name: '带系数', desc: '基础值 × 系数', unit: '考虑损耗' },
-  { name: '跨构件', desc: '涉及多构件运算', unit: '幕墙-嵌板' },
+  { name: '计数', desc: '统计族实例数量', unit: '台/个/套', icon: '#' },
+  { name: '参数汇总', desc: '某参数值求和', unit: 'm²/m/m³', icon: 'Σ' },
+  { name: '带系数', desc: '基础值 × 系数', unit: '考虑损耗', icon: '×' },
+  { name: '跨构件', desc: '涉及多构件运算', unit: '幕墙-嵌板', icon: '⊕' },
 ]
 
-// 滚动动画 Hook
-function useScrollAnimation() {
-  const ref = useRef(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible')
-          }
-        })
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-    )
-
-    const elements = ref.current?.querySelectorAll('.animate-on-scroll')
-    elements?.forEach((el) => observer.observe(el))
-
-    return () => observer.disconnect()
-  }, [])
-
-  return ref
+const colorClasses = {
+  green: { dot: 'bg-accent-green', badge: 'badge-green' },
+  amber: { dot: 'bg-accent-amber', badge: 'badge-amber' },
+  blue: { dot: 'bg-accent-blue', badge: 'badge-blue' },
+  purple: { dot: 'bg-accent-purple', badge: 'badge-purple' },
+  red: { dot: 'bg-accent-red', badge: 'badge-red' },
 }
 
 export default function LogicPage() {
-  const containerRef = useScrollAnimation()
-
   return (
-    <div ref={containerRef} className="max-w-5xl mx-auto px-6 lg:px-8 py-12">
-      {/* 页面标题 */}
-      <section className="text-center mb-12 animate-fade-up">
-        <h1 className="text-3xl sm:text-4xl font-bold text-on-surface mb-3">
-          业务逻辑
-        </h1>
-        <p className="text-on-surface-variant">
-          清单匹配规则与工程量计算方式
-        </p>
-      </section>
-
+    <div className="space-y-6">
       {/* 核心流程 */}
-      <section className="mb-12 animate-on-scroll">
-        <div className="bg-surface-bright/30 rounded-2xl p-6 border border-outline-variant/30">
-          <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
-            <span className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg">族上传</span>
-            <span className="text-on-surface-variant">→</span>
-            <span className="px-3 py-1.5 bg-purple-500/20 text-purple-400 rounded-lg">品目配置</span>
-            <span className="text-on-surface-variant">→</span>
-            <span className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg">清单匹配</span>
-            <span className="text-on-surface-variant">→</span>
-            <span className="px-3 py-1.5 bg-amber-500/20 text-amber-400 rounded-lg">工程量计算</span>
-          </div>
+      <section className="card p-6">
+        <h2 className="font-semibold mb-4">核心流程</h2>
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          {[
+            { label: '族上传', color: 'badge-blue' },
+            { label: '品目配置', color: 'badge-purple' },
+            { label: '清单匹配', color: 'badge-green' },
+            { label: '工程量计算', color: 'badge-amber' },
+          ].map((step, i, arr) => (
+            <div key={step.label} className="flex items-center gap-2 sm:gap-3">
+              <span className={`badge ${step.color} px-3 py-1.5`}>{step.label}</span>
+              {i < arr.length - 1 && (
+                <svg className="w-4 h-4 text-text-tertiary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 
       {/* 清单匹配规则 */}
-      <section className="mb-16 animate-on-scroll">
-        <h2 className="text-sm font-semibold text-primary uppercase tracking-wider mb-6">
-          清单匹配（5种方式）
-        </h2>
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold">清单匹配规则</h2>
+          <span className="badge badge-blue">5 种方式</span>
+        </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {matchTypes.map((type) => (
+          {matchTypes.map((type, i) => (
             <div
               key={type.id}
-              className="bg-surface-bright/30 rounded-2xl p-5 border border-outline-variant/30 hover:border-primary/30 transition-colors"
+              className="card p-5 animate-fade-up"
+              style={{ animationDelay: `${i * 0.05}s` }}
             >
-              <div className={`w-3 h-3 rounded-full bg-gradient-to-br ${type.gradient} mb-3`} />
-              <h3 className="font-medium text-on-surface mb-1">{type.name}</h3>
-              <p className="text-sm text-on-surface-variant mb-3">{type.desc}</p>
-              <code className="text-xs text-primary bg-primary/10 px-2 py-1 rounded">
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`w-3 h-3 rounded-full ${colorClasses[type.color].dot}`} />
+                <h3 className="font-medium">{type.name}</h3>
+              </div>
+              <p className="text-sm text-text-secondary mb-3">{type.desc}</p>
+              <code className="text-xs text-accent-blue bg-accent-blue/10 px-2 py-1 rounded block">
                 {type.example}
               </code>
             </div>
@@ -126,27 +110,47 @@ export default function LogicPage() {
       </section>
 
       {/* 工程量计算 */}
-      <section className="animate-on-scroll">
-        <h2 className="text-sm font-semibold text-primary uppercase tracking-wider mb-6">
-          工程量计算（4种方式）
-        </h2>
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold">工程量计算</h2>
+          <span className="badge badge-green">4 种方式</span>
+        </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
-          {quantityTypes.map((type) => (
+          {quantityTypes.map((type, i) => (
             <div
               key={type.name}
-              className="bg-surface-bright/30 rounded-2xl p-5 border border-outline-variant/30 flex items-start gap-4"
+              className="card p-5 flex items-start gap-4 animate-fade-up"
+              style={{ animationDelay: `${i * 0.05}s` }}
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center text-primary font-bold text-sm flex-shrink-0">
-                {type.name.charAt(0)}
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent-blue/20 to-accent-purple/20 flex items-center justify-center text-accent-blue font-bold text-lg flex-shrink-0">
+                {type.icon}
               </div>
-              <div>
-                <h3 className="font-medium text-on-surface">{type.name}</h3>
-                <p className="text-sm text-on-surface-variant">{type.desc}</p>
-                <span className="text-xs text-primary">{type.unit}</span>
+              <div className="flex-1">
+                <h3 className="font-medium mb-1">{type.name}</h3>
+                <p className="text-sm text-text-secondary">{type.desc}</p>
+                <span className="text-xs text-text-tertiary">{type.unit}</span>
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* 说明 */}
+      <section className="card p-6 border-accent-blue/30">
+        <div className="flex gap-3">
+          <div className="w-8 h-8 rounded-lg bg-accent-blue/10 flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-accent-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4M12 8h.01" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="font-medium mb-1">核心理念：建模即算量</h3>
+            <p className="text-sm text-text-secondary">
+              通过 BIM 模型中的族参数自动匹配清单，并计算工程量。系统支持灵活的匹配规则配置，适应不同业主的清单结构。
+            </p>
+          </div>
         </div>
       </section>
     </div>

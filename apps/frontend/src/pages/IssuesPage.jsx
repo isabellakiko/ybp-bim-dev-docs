@@ -1,6 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+/**
+ * YBP 问题追踪页
+ */
 
-// 问题追踪（与 02-开发准备 同步，12-03 会议后更新）
+import { useState } from 'react'
+
+// 问题数据
 const issues = [
   // ===== 已解决 =====
   {
@@ -72,45 +76,19 @@ const issues = [
 ]
 
 const statusConfig = {
-  pending: { label: '待讨论', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-  discussing: { label: '讨论中', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-  resolved: { label: '已解决', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  pending: { label: '待讨论', color: 'badge-amber' },
+  discussing: { label: '讨论中', color: 'badge-blue' },
+  resolved: { label: '已解决', color: 'badge-green' },
 }
 
 const priorityConfig = {
-  P0: { label: 'P0', color: 'text-red-400', bg: 'bg-red-500/10' },
-  P1: { label: 'P1', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-  P2: { label: 'P2', color: 'text-on-surface-variant', bg: 'bg-surface-bright/50' },
-}
-
-// 滚动动画 Hook
-function useScrollAnimation() {
-  const ref = useRef(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible')
-          }
-        })
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-    )
-
-    const elements = ref.current?.querySelectorAll('.animate-on-scroll')
-    elements?.forEach((el) => observer.observe(el))
-
-    return () => observer.disconnect()
-  }, [])
-
-  return ref
+  P0: { label: 'P0', color: 'badge-red' },
+  P1: { label: 'P1', color: 'badge-amber' },
+  P2: { label: 'P2', color: 'bg-bg-active text-text-secondary' },
 }
 
 export default function IssuesPage() {
   const [filter, setFilter] = useState('all')
-  const containerRef = useScrollAnimation()
 
   const filteredIssues = filter === 'all'
     ? issues
@@ -124,77 +102,103 @@ export default function IssuesPage() {
   }
 
   return (
-    <div ref={containerRef} className="max-w-5xl mx-auto px-6 lg:px-8 py-12">
-      {/* 页面标题 */}
-      <section className="text-center mb-12 animate-fade-up">
-        <h1 className="text-3xl sm:text-4xl font-bold text-on-surface mb-3">
-          问题追踪
-        </h1>
-        <p className="text-on-surface-variant">
-          12-03 会议结论 · 12-04 评审
-        </p>
+    <div className="space-y-6">
+      {/* 统计卡片 */}
+      <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { key: 'all', label: '全部问题', count: counts.all, color: 'text-text-primary' },
+          { key: 'resolved', label: '已解决', count: counts.resolved, color: 'text-accent-green' },
+          { key: 'discussing', label: '讨论中', count: counts.discussing, color: 'text-accent-blue' },
+          { key: 'pending', label: '待讨论', count: counts.pending, color: 'text-accent-amber' },
+        ].map((stat) => (
+          <button
+            key={stat.key}
+            onClick={() => setFilter(stat.key)}
+            className={`card p-4 text-left transition-all ${
+              filter === stat.key ? 'border-accent-blue ring-1 ring-accent-blue/20' : ''
+            }`}
+          >
+            <div className={`text-2xl font-bold font-mono ${stat.color}`}>{stat.count}</div>
+            <div className="text-sm text-text-secondary">{stat.label}</div>
+          </button>
+        ))}
       </section>
 
-      {/* 筛选 */}
-      <section className="mb-8 animate-on-scroll">
-        <div className="flex gap-2 justify-center">
-          {[
-            { key: 'all', label: `全部 (${counts.all})` },
-            { key: 'resolved', label: `已解决 (${counts.resolved})` },
-            { key: 'discussing', label: `进行中 (${counts.discussing})` },
-            { key: 'pending', label: `待讨论 (${counts.pending})` },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setFilter(tab.key)}
-              className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-                filter === tab.key
-                  ? 'bg-primary text-white'
-                  : 'bg-surface-bright/30 text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      {/* 筛选标签 */}
+      <section className="flex gap-2 flex-wrap">
+        {[
+          { key: 'all', label: '全部' },
+          { key: 'discussing', label: '讨论中' },
+          { key: 'pending', label: '待讨论' },
+          { key: 'resolved', label: '已解决' },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setFilter(tab.key)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              filter === tab.key
+                ? 'bg-accent-blue text-white'
+                : 'bg-bg-elevated text-text-secondary hover:text-text-primary hover:bg-bg-hover'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </section>
 
       {/* 问题列表 */}
-      <section className="animate-on-scroll">
-        <div className="space-y-4">
-          {filteredIssues.map((issue) => (
-            <div
-              key={issue.id}
-              className="bg-surface-bright/30 rounded-2xl p-5 border border-outline-variant/30"
-            >
-              <div className="flex items-start justify-between gap-4 mb-3">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded ${priorityConfig[issue.priority].bg} ${priorityConfig[issue.priority].color}`}>
+      <section className="space-y-3">
+        {filteredIssues.map((issue, i) => (
+          <div
+            key={issue.id}
+            className="card p-5 animate-fade-up"
+            style={{ animationDelay: `${i * 0.03}s` }}
+          >
+            <div className="flex items-start gap-4">
+              {/* 状态指示器 */}
+              <div className={`status-dot mt-2 ${
+                issue.status === 'resolved' ? 'success' :
+                issue.status === 'discussing' ? 'info' : 'warning'
+              }`} />
+
+              <div className="flex-1 min-w-0">
+                {/* 标题行 */}
+                <div className="flex items-center gap-2 flex-wrap mb-2">
+                  <span className={`badge ${priorityConfig[issue.priority].color}`}>
                     {issue.priority}
                   </span>
-                  <span className={`text-xs px-2 py-0.5 rounded ${statusConfig[issue.status].bg} ${statusConfig[issue.status].color}`}>
+                  <span className={`badge ${statusConfig[issue.status].color}`}>
                     {statusConfig[issue.status].label}
                   </span>
-                  <h3 className="font-medium text-on-surface">{issue.title}</h3>
+                  <h3 className="font-medium">{issue.title}</h3>
+                </div>
+
+                {/* 描述 */}
+                <p className="text-sm text-text-secondary mb-3">{issue.desc}</p>
+
+                {/* 标签 */}
+                <div className="flex flex-wrap gap-2">
+                  {issue.items.map((item, j) => (
+                    <span
+                      key={j}
+                      className="text-xs bg-bg-active text-text-tertiary px-2 py-1 rounded"
+                    >
+                      {item}
+                    </span>
+                  ))}
                 </div>
               </div>
-
-              <p className="text-sm text-on-surface-variant mb-3">{issue.desc}</p>
-
-              <div className="flex flex-wrap gap-2">
-                {issue.items.map((item, i) => (
-                  <span key={i} className="text-xs bg-surface-dim/50 text-on-surface-variant px-2 py-1 rounded">
-                    {item}
-                  </span>
-                ))}
-              </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
 
+        {/* 空状态 */}
         {filteredIssues.length === 0 && (
-          <div className="text-center py-12 text-on-surface-variant">
-            暂无 {statusConfig[filter]?.label} 的问题
+          <div className="card p-12 text-center">
+            <div className="text-4xl mb-3">🎉</div>
+            <p className="text-text-secondary">
+              暂无{statusConfig[filter]?.label}的问题
+            </p>
           </div>
         )}
       </section>

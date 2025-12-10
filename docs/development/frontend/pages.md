@@ -167,18 +167,19 @@ function useScrollAnimation() {
 
 ### 页面说明
 
-展示 YBP 系统的业务逻辑，包括四种清单匹配规则和三个典型案例。
+展示 YBP 系统的业务逻辑，包括五种清单匹配规则和典型案例。
 
 ### 页面结构
 
 ```
 LogicPage
 ├── 页面标题
-├── 四种匹配规则
+├── 五种匹配规则
 │   ├── 无条件匹配
 │   ├── 精确值匹配
 │   ├── 区间匹配
-│   └── 多参数 AND
+│   ├── 多参数 AND
+│   └── 多参数区间联合
 └── 典型案例（可展开）
     ├── 新风机（精确值匹配）
     ├── MCD-新风机（区间匹配）
@@ -218,6 +219,13 @@ const matchTypes = [
     desc: '多个条件同时满足才匹配',
     example: '材质=灰砖 AND 品牌=琛雄',
     gradient: 'from-purple-500 to-pink-500',
+  },
+  {
+    id: 'multi-range',
+    name: '多参数区间联合',
+    desc: '多个参数各自区间匹配，联合判断',
+    example: '风量 2000-4000 AND 功率 1-3kW',
+    gradient: 'from-rose-500 to-pink-500',
   },
 ]
 ```

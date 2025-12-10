@@ -59,6 +59,11 @@ echo "当前时间: $CURRENT_DATE $CURRENT_TIME (第 $CURRENT_WEEK_NUM 周)"
 ## Step 3: 检查项目状态
 
 ```bash
+# 检查环境版本
+echo "=== 环境信息 ==="
+node -v
+pnpm -v
+
 # 检查 dev server 是否运行
 lsof -i :5173 2>/dev/null | head -2 || echo "Dev server 未运行"
 

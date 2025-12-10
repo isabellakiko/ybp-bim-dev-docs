@@ -1,7 +1,7 @@
 ---
 description: ESLint 自动修复，一键修复可自动修复的代码问题
 argument-hint: [--check | --staged]
-allowed-tools: Bash(cd apps/frontend && pnpm lint:*), Bash(pnpm lint:*)
+allowed-tools: Bash, Read
 ---
 
 <task>

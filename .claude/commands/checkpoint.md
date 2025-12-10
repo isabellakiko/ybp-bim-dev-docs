@@ -6,6 +6,18 @@ allowed-tools: Read, Write, Edit, Bash(date, git)
 
 <task>
 完成一个功能/阶段后，更新开发文档，可选创建 Git commit。
+
+---
+
+**`/checkpoint` vs `/end` 对比**：
+
+| 特性 | `/checkpoint` | `/end` |
+|------|---------------|--------|
+| 使用时机 | 完成一个功能/阶段 | 结束当天工作 |
+| 文档更新 | CURRENT.md（追加） | CURRENT.md + CONTEXT.md |
+| Git 操作 | 可选 commit | 必须 commit |
+| 推送 | 不推送 | 可选推送 |
+| 频率 | 每 1-2 小时 | 每天一次 |
 </task>
 
 <workflow>

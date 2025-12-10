@@ -2,9 +2,9 @@
 
 > AI 协作记忆文件 - 快速恢复项目上下文，立即开始工作
 
-**最后更新**: 2025-12-03
-**项目阶段**: 第二阶段 - 开发准备
-**当前状态**: 工程量计算讨论完成，进入业主清单梳理
+**最后更新**: 2025-12-10
+**项目阶段**: 第四阶段 - 开发准备
+**当前状态**: 文档系统优化，业主清单梳理进行中
 
 ---
 
@@ -28,54 +28,22 @@
 
 ---
 
-## 项目结构
+## 项目结构（核心）
 
 ```
 YBP/
-├── .claude/
-│   └── commands/           # 6 个 Slash Commands
-│       ├── start.md
-│       ├── checkpoint.md
-│       ├── end.md
-│       ├── weekly.md
-│       ├── monthly.md
-│       └── audit.md
-│
-├── apps/
-│   └── frontend/           # 前端应用
-│       ├── src/
-│       │   ├── components/ # 组件
-│       │   ├── pages/      # 3 个页面
-│       │   └── index.css   # 全局样式
-│       ├── package.json
-│       └── vite.config.js
-│
-├── docs/                   # 4 层文档架构
-│   ├── ai-context/         # 第1层：AI记忆
-│   │   ├── CONTEXT.md
-│   │   ├── CURRENT.md
-│   │   └── archive/
-│   ├── development/        # 第2层：开发文档
-│   │   ├── DEVELOPMENT.md
-│   │   └── frontend/
-│   ├── architecture/       # 第3层：架构
-│   │   ├── OVERVIEW.md
-│   │   ├── tech-stack.md
-│   │   └── adr/
-│   ├── project/            # 第4层：项目/业务
-│   │   ├── overview/         # 通用信息（跨阶段）
-│   │   ├── 01-原型评审/       # 第一阶段（已完成）
-│   │   ├── 02-开发准备/       # 第二阶段（进行中）
-│   │   ├── issues/           # 问题追踪
-│   │   ├── design/
-│   │   ├── vision.md
-│   │   └── ROADMAP.md
+├── apps/frontend/src/      # 前端应用（3 页面 + 组件）
+├── docs/
+│   ├── ai-context/         # AI 记忆 ⭐
+│   ├── project/            # 业务文档（阶段制）
+│   │   ├── overview/       # 跨阶段信息
+│   │   ├── 01-原型评审/    # 第一阶段（完成）
+│   │   └── 02-开发准备/    # 第四阶段（进行中）
 │   └── guides/             # 参考指南
-│
-├── .github/                # GitHub 配置
-├── README.md
-└── CONTRIBUTING.md
+└── .claude/commands/       # 8 个 Slash Commands
 ```
+
+> 完整结构详见 [架构总览](../architecture/OVERVIEW.md)
 
 ---
 
@@ -89,61 +57,28 @@ YBP/
 
 ---
 
-## 业务核心概念
+## 业务核心
 
-> **详细业务逻辑请查看**: [业务逻辑摘要](../project/overview/业务逻辑摘要.md)
->
-> 包含：5种清单匹配方式、4种工程量计算方式、参数体系、族类型处理
+> 详见 [业务逻辑摘要](../project/overview/业务逻辑摘要.md)
 
 ```
 族(Family) → 品目(Item) → 清单(Bill) → 工程量(Quantity)
-     ↓           ↓           ↓            ↓
-  Revit构件    系统分类     计价项目     数量计算
 ```
 
-**核心要点**:
-- 清单匹配：无条件 / 单参数区间 / 单参数精确 / 多参数AND / 多参数区间联合
-- 工程量计算：计数 / 参数汇总 / 带系数 / 跨构件
-- 参数体系：几何参数(只读) vs 非几何参数(可维护)
-- 族类型：自建族(.rfa) / 系统族(在.rvt中) / 叠层墙 / 幕墙
+**核心理念**: 建模即算量 - 基于 Revit 模型自动计算工程量
 
 ---
 
-## 设计系统（Google 风格暗色主题）
+## 设计系统
 
-### 配色方案
+**风格**: Google 暗色主题
+**字体**: Times New Roman + PingFang SC
+**核心配色**:
+- 背景: `#1f2937` (surface)
+- 主色: `#60a5fa` (primary blue)
+- 文字: `#f9fafb` (on-surface)
 
-```
-表面色:
-- surface-dim: #111827 (最深背景)
-- surface: #1f2937 (主背景，带蓝调)
-- surface-bright: #374151 (亮表面)
-
-主色调:
-- primary: #60a5fa (柔和蓝色)
-- secondary: #a78bfa (紫色)
-- tertiary: #34d399 (绿色)
-
-文字色:
-- on-surface: #f9fafb (主文字)
-- on-surface-variant: #d1d5db (次要文字)
-```
-
-### 字体
-
-```css
-font-family: 'Times New Roman', Georgia, 'PingFang SC', 'Microsoft YaHei', serif;
-```
-
-### 动画系统
-
-```css
-.animate-fade-up    /* 入场淡入上移 */
-.animate-on-scroll  /* Intersection Observer 滚动触发 */
-.hover-lift         /* 悬浮上浮+阴影 */
-.glass              /* 玻璃效果（backdrop-blur） */
-.gradient-mesh      /* 多色渐变网格背景 */
-```
+> 详见 CSS 变量定义: `apps/frontend/src/index.css`
 
 ---
 
@@ -168,14 +103,13 @@ font-family: 'Times New Roman', Georgia, 'PingFang SC', 'Microsoft YaHei', serif
 - ✅ 族库维护逻辑梳理
 - ✅ 需求文档 7 篇
 
-### 第二阶段（开发准备）🚧 进行中
+### 第四阶段（开发准备）🚧 进行中
 - ✅ 项目重构为 Monorepo 结构
-- ✅ 4 层文档架构 + 阶段制文档
-- ✅ 6 个 Slash Commands
+- ✅ 4 层文档架构 + 8 个 Slash Commands
 - ✅ 工程量计算技术讨论（12-03 会议）
-- ✅ 插件功能点确认（独立插件+集成通用代码）
+- ✅ 插件功能点确认
+- 🚧 AI 协作文档系统优化
 - 🚧 业主清单工程量梳理（12月核心任务）
-- ⏳ 族库维护遗留问题
 
 ---
 
@@ -195,36 +129,15 @@ font-family: 'Times New Roman', Georgia, 'PingFang SC', 'Microsoft YaHei', serif
 - 清单库维护、版本管理 → 黄增沛 ↔ 李昱 直接对接
 - 清单分类维护 → 李工与黄工另行对接
 
-### 第二阶段工作模块
+### 12月核心任务
 
-| 模块 | 状态 | 说明 |
-|------|------|------|
-| 工程量计算 | ✅ 已讨论 | 幕墙/跨品目/系统名称细分已确认，水管需专项梳理 |
-| 插件功能 | ✅ 已确认 | 独立插件，类似功能集成通用代码 |
-| 族库维护 | ⏳ 遗留问题 | 待李工与黄工对接 |
+> 详见 [交接进度](../project/overview/参与方.md#交接进度12月底截止)
 
-### 12月核心任务：业主清单工程量梳理
-
-**总目标**：全面梳理 YBP 业主清单的工程量计算部分
-
-| 任务 | 说明 | 状态 |
-|------|------|------|
-| 业主清单梳理 | 麦当劳、奥乐齐，分类 Revit自带 vs 需代码实现 | 待开始 |
-| 水管系统专项 | 所有管件（双头、三通、变径等）计算规则 | 待开始 |
-| 风管系统专项 | "系统名称"细分功能应用范围 | 待开始 |
-
-**协作**：薛飘飘（建模）、造价人员（计价规则）
-
-### 12-03 会议结论摘要
-
-| 议题 | 结论 |
+| 任务 | 状态 |
 |------|------|
-| 评审范围 | 三个模块全部在范围内，12-04 评审 |
-| 插件功能 | 独立插件，类似功能集成通用插件代码 |
-| 幕墙工程量 | 系统端可自定义配置组合基础量 |
-| 跨品目清单 | 确认支持 |
-| 排水管变径 | 需后续专项梳理所有管件情况 |
-| 系统名称细分 | 插件端不难，系统端通过品目配置关联 |
+| 水管工程量计算规则 | ⏳ 待开始 |
+| 系统名称属性应用范围 | ⏳ 待开始 |
+| 业主清单工程量分类表 | ⏳ 待开始 |
 
 ---
 
@@ -237,17 +150,6 @@ font-family: 'Times New Roman', Georgia, 'PingFang SC', 'Microsoft YaHei', serif
 - ❌ 不使用 TypeScript
 - ❌ 不使用 Tailwind v4
 
-### Slash Commands
-
-```bash
-/start              # 恢复项目记忆
-/checkpoint         # 阶段性保存进度
-/end                # 每日结束
-/weekly             # 每周文档优化
-/monthly            # 每月归档
-/audit              # 项目健康检查
-```
-
 ---
 
 ## 快速导航
@@ -256,10 +158,9 @@ font-family: 'Times New Roman', Georgia, 'PingFang SC', 'Microsoft YaHei', serif
 - [当前进度](CURRENT.md) ⭐
 
 ### 项目文档
-- [项目总览](../project/overview/README.md) - 阶段摘要
-- [第一阶段](../project/01-原型评审/README.md) - 原型评审（完成）
-- [第二阶段](../project/02-开发准备/README.md) - 开发准备（进行中）
-- [待讨论问题](../project/issues/open/99_待讨论问题.md)
+- [项目总览](../project/overview/README.md)
+- [第四阶段](../project/02-开发准备/README.md) - 开发准备（进行中）
+- [交接清单](../project/overview/参与方.md) - 12月底截止
 
 ### 开发参考
 - [开发规范](../development/DEVELOPMENT.md)

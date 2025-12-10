@@ -1,6 +1,6 @@
 ---
 description: 项目健康检查，代码质量、依赖、文档同步
-argument-hint: [--quick | --full | --security]
+argument-hint: [--quick | --full | --security | --docs]
 allowed-tools: Read, Bash(date, git, pnpm, find, wc)
 ---
 
@@ -22,12 +22,20 @@ echo "审计时间: $CURRENT_DATE $CURRENT_TIME (第 $CURRENT_WEEK_NUM 周)"
 
 ## Step 1: 解析参数
 
-| 参数 | 检查范围 | 预计时间 |
-|------|----------|----------|
-| `--quick` | 代码质量 + Git 状态 | 2-3 分钟 |
-| 无参数 | 标准检查 | 5-10 分钟 |
-| `--full` | 全部检查（含构建测试） | 10-15 分钟 |
-| `--security` | 重点安全漏洞扫描 | 3-5 分钟 |
+| 参数 | 检查范围 | 预计时间 | 使用场景 |
+|------|----------|----------|----------|
+| `--quick` | 代码质量 + Git 状态 | 2-3 分钟 | 日常快速检查 |
+| 无参数 | 标准检查 | 5-10 分钟 | 每周例行检查 |
+| `--full` | 全部检查（含构建测试） | 10-15 分钟 | 大版本后 |
+| `--security` | 重点安全漏洞扫描 | 3-5 分钟 | 上线前 |
+| `--docs` | 文档同步审计 | 5-8 分钟 | Phase 完成后 |
+
+**--docs 模式特殊检查**:
+- CONTEXT.md 准确性（阶段、技术栈、状态）
+- CURRENT.md 时效性（最后更新时间）
+- 组件文档完整性（components.md vs 实际组件）
+- 页面文档同步（pages.md vs 实际页面）
+- 交接清单进度（参与方.md 进度表）
 
 ## Step 2: 代码质量检查
 
